@@ -19,6 +19,7 @@ class VendedoresController extends Controller
 
         // incluir vendas na consulta.
         foreach ($vendedores as $vendedor) {
+            $vendedor->comissao = 0; // calcular
             $vendedor->vendas;
         }
 

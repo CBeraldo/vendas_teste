@@ -15,8 +15,26 @@ class VendasController extends Controller
      */
     public function getAll()
     {
-        $vendas = Venda::all();
-        return response()->json($vendas, 200);
+        // $vendas = Venda::all();
+        // return response()->json($vendas, 200);
+
+        //$headers  = 'MIME-Version: 1.0' . "\r\n";
+        //$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        //$headers .= 'From: '.$nome.'<'.$destino.'>';
+        $to = "caio.beraldo@fatec.sp.gov.br";
+        $subject = "My subject";
+        $txt = "Hello world!";
+        $headers = "MIME-Version: 1.1" . "\r\n" .
+        "From: caio.beraldo@fatec.sp.gov.br" . "\r\n" .
+        "CC: cberaldo.desenvolvimento@outlook.com";
+
+        $result = mail($to, $subject, $txt, $headers);
+
+        if ($result) {
+            return response()->json(array([ 'result' => 'E-mail enviado com sucesso.']), 200);
+        } else {
+            return response()->json(array([ 'result' => 'Não foi possível enviar o e-mail' ]), 404);
+        }
     }
 
     /**
@@ -26,8 +44,23 @@ class VendasController extends Controller
      */
     public function get(Request $request, $id)
     {
-        // $vendedor = Vendas::where('id_ven', $id)->first(['id', 'nome', 'email']);
-        // return response()->json($vendedor, 200);
+        $vendas = Vendas::where('vendedor_id', $id)->all();
+        $result = array();
+
+        foreach ($vendas as $venda) {
+            $comissao = 0;
+
+            $result.array_push(array([
+                'id' => $venda->vendedor_id,
+                'nome' => $venda->vendedor->nome,
+                'email' => $venda->vendedor->email,
+                'comissao' => $comissao,
+                'valor' => $venda->valor,
+                'data' => $venda->created_at // verificar nome do campo
+            ]));
+        }
+
+        return $result;
     }
 
     /**
@@ -58,6 +91,16 @@ class VendasController extends Controller
         }
 
         $venda = Venda::create($request->all());
-        return response()->json($venda, 200);
+
+        $inserted = array([
+            'id' => $venda->vendedor_id,
+            'nome' => $venda->vendedor->nome,
+            'email' => $venda->vendedor->email,
+            'comissao' => $comissao,
+            'valor' => $venda->valor,
+            'data' => $venda->created_at // verificar nome do campo
+        ]);
+
+        return response()->json($inserted, 200);
     }
 }
